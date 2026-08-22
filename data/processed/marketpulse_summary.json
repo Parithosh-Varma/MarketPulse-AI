@@ -1,0 +1,120 @@
+{
+  "generated_at": "2026-08-22T06:06:48.225521+00:00",
+  "focus_symbol": "NIFTY50",
+  "engine_model": "vader",
+  "sentiment_by_asset": {
+    "BTC": {
+      "n": 186,
+      "score": 0.0364,
+      "share_positive": 0.269,
+      "share_negative": 0.113,
+      "share_neutral": 0.618
+    },
+    "NIFTY50": {
+      "n": 213,
+      "score": 0.2253,
+      "share_positive": 0.592,
+      "share_negative": 0.103,
+      "share_neutral": 0.305
+    }
+  },
+  "momentum_recent": [
+    {
+      "as_of": "2024-10-25",
+      "previous": 0.2842,
+      "current": 0.3339,
+      "momentum": 0.0498,
+      "classification": "stable",
+      "accelerating": false,
+      "reversal": false
+    },
+    {
+      "as_of": "2024-10-26",
+      "previous": 0.3339,
+      "current": 0.1853,
+      "momentum": -0.1486,
+      "classification": "deteriorating",
+      "accelerating": false,
+      "reversal": false
+    },
+    {
+      "as_of": "2024-10-27",
+      "previous": 0.1853,
+      "current": 0.0,
+      "momentum": -0.1853,
+      "classification": "deteriorating",
+      "accelerating": true,
+      "reversal": false
+    },
+    {
+      "as_of": "2024-10-28",
+      "previous": 0.0,
+      "current": 0.2009,
+      "momentum": 0.2009,
+      "classification": "improving",
+      "accelerating": false,
+      "reversal": true
+    },
+    {
+      "as_of": "2024-10-29",
+      "previous": 0.2009,
+      "current": 0.3006,
+      "momentum": 0.0997,
+      "classification": "stable",
+      "accelerating": false,
+      "reversal": false
+    },
+    {
+      "as_of": "2024-10-30",
+      "previous": 0.3006,
+      "current": 0.362,
+      "momentum": 0.0614,
+      "classification": "stable",
+      "accelerating": false,
+      "reversal": false
+    },
+    {
+      "as_of": "2024-10-31",
+      "previous": 0.362,
+      "current": 0.2384,
+      "momentum": -0.1236,
+      "classification": "deteriorating",
+      "accelerating": false,
+      "reversal": false
+    }
+  ],
+  "divergence": {
+    "as_of": "2024-12-30",
+    "window_days": 17,
+    "price_return": -0.0454,
+    "sentiment_change": -0.1236,
+    "score": 0.66,
+    "classification": "aligned_bearish",
+    "confidence": 0.465
+  },
+  "regime": {
+    "regime": "neutral",
+    "confidence": 0.3,
+    "risk_appetite": "unknown",
+    "stress": null,
+    "components": {
+      "price_momentum": -0.02014824134085913,
+      "realized_volatility": 0.0069495744987362424,
+      "vix_level": 11.2,
+      "sentiment": null,
+      "sentiment_momentum": null,
+      "gmsi": null,
+      "mfi": null
+    }
+  },
+  "backtest": {
+    "hit_rate": 0.333,
+    "random_hit_rate": 0.333,
+    "n_evaluated": 21,
+    "mean_forward_return": -0.00612,
+    "buy_hold": -0.0683,
+    "max_drawdown": -0.1356,
+    "note": "research evaluation, not a trading simulation"
+  },
+  "alerts_fired_this_run": []
+}
