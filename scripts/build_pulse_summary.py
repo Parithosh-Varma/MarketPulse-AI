@@ -61,10 +61,23 @@ def load_text(limit: int) -> list[SentimentObservation]:
     return out
 
 
+def _price_file(symbol_key: str) -> Path:
+    """Prefer freshly pulled live bars; fall back to bundled history."""
+    live = RAW / "live" / f"{symbol_key.lower()}_prices.csv"
+    bundled = {
+        "BTC": "btc_prices.csv",
+        "NIFTY50": "nifty_prices.csv",
+    }.get(symbol_key)
+    if live.exists():
+        return live
+    if bundled:
+        return RAW / bundled
+    raise FileNotFoundError(f"no price data for {symbol_key}")
+
+
 def load_prices(symbol_key: str) -> list[MarketObservation]:
-    fname = {"BTC": "btc_prices.csv", "NIFTY50": "nifty_prices.csv"}[symbol_key]
     rows: list[MarketObservation] = []
-    with open(RAW / fname, newline="", encoding="utf-8") as handle:
+    with open(_price_file(symbol_key), newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
             close = float(row["close"])
             rows.append(
@@ -106,7 +119,18 @@ def build_snapshot(max_rows: int) -> dict:
         else None
     )
 
-    tail = aligned_prices[-21:]
+    # Regime runs on the LATEST bars regardless of sentiment-span overlap,
+    # and consumes real India VIX when live bars exist.
+    vix_level = None
+    try:
+        vix_rows = load_prices("INDIAVIX")
+        if vix_rows:
+            vix_level = float(vix_rows[-1].vix or vix_rows[-1].close)
+    except FileNotFoundError:
+        pass
+
+    regime_prices = aligned_prices or prices[-60:]
+    tail = regime_prices[-21:]
     mom_value = tail[-1].close / tail[0].close - 1.0 if len(tail) >= 2 else None
     rets = [
         b.close / a.close - 1.0
@@ -114,15 +138,32 @@ def build_snapshot(max_rows: int) -> dict:
         if a.close > 0
     ]
     vol = (sum(r * r for r in rets) / len(rets)) ** 0.5 if rets else None
-    regime = classify_regime(
-        RegimeInputs(
-            as_of=aligned_prices[-1].timestamp,
-            symbol=focus,
-            price_momentum=mom_value,
-            realized_volatility=vol,
-            sentiment=daily[-1].mean_score if daily else None,
+    # sentiment counts only if its freshest bucket is recent relative to bars
+    last_sent = None
+    sent_mom_value = None
+    if daily and regime_prices:
+        gap_days = (
+            regime_prices[-1].timestamp - daily[-1].window_end
+        ).days
+        if abs(gap_days) <= 10:
+            last_sent = daily[-1].mean_score
+            if len(momentum) >= 1:
+                sent_mom_value = momentum[-1].momentum
+    regime = (
+        classify_regime(
+            RegimeInputs(
+                as_of=regime_prices[-1].timestamp,
+                symbol=focus,
+                price_momentum=mom_value,
+                realized_volatility=vol,
+                vix_level=vix_level,
+                sentiment=last_sent,
+                sentiment_momentum=sent_mom_value,
+            )
         )
-    ) if aligned_prices else None
+        if regime_prices
+        else None
+    )
 
     backtest = None
     try:
