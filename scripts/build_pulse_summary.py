@@ -258,14 +258,21 @@ def build_snapshot(max_rows: int) -> dict:
     }
 
 
-def main() -> None:
-    max_rows = int(sys.argv[1]) if len(sys.argv) > 1 else 400
+def write_snapshot(max_rows: int = 400) -> Path:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     snapshot = build_snapshot(max_rows)
     target = OUT_DIR / "marketpulse_summary.json"
     target.write_text(json.dumps(snapshot, indent=2))
-    print(f"wrote {target} ({snapshot['focus_symbol']}, "
-          f"{len(snapshot['sentiment_by_asset'])} assets)")
+    print(
+        f"wrote {target} ({snapshot['focus_symbol']}, "
+        f"{len(snapshot['sentiment_by_asset'])} assets)"
+    )
+    return target
+
+
+def main() -> None:
+    max_rows = int(sys.argv[1]) if len(sys.argv) > 1 else 400
+    write_snapshot(max_rows)
 
 
 if __name__ == "__main__":

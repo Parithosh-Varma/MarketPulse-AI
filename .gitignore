@@ -28,7 +28,8 @@ data/raw/alpha_vantage/
 data/raw/reddit/
 data/raw/newsapi/
 data/raw/quandl/
-data/processed/
+data/processed/*
+!data/processed/marketpulse_summary.json
 notebooks/data/raw/
 
 # Parquet cache files

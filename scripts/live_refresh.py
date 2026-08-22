@@ -63,11 +63,10 @@ def fetch_live_prices(days: int = 90) -> None:
 
 
 def rebuild_snapshot() -> None:
+    import build_demo_site as bds
     import build_pulse_summary as bps
 
-    bps.main()
-    import build_demo_site as bds
-
+    bps.write_snapshot(400)
     bds.main()
 
 
