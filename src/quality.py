@@ -8,6 +8,7 @@ raising, so pipelines can aggregate a report, log it, and decide policy
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import statistics
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
@@ -204,23 +205,24 @@ def check_market_observations(
             )
         )
 
+    # Robust outlier detection via median / MAD — a single extreme value
+    # inflates mean+std enough to hide itself from a naive z-score.
     closes = [float(r.close) for r in rows]
-    mean_close = sum(closes) / len(closes)
-    var = sum((c - mean_close) ** 2 for c in closes) / len(closes)
-    std = var ** 0.5
-    if std > 0:
-        outliers = [
-            c for c in closes if abs((c - mean_close) / std) > outlier_z
-        ]
-        if outliers:
-            issues.append(
-                QualityIssue(
-                    check="price_outliers",
-                    severity=SEVERITY_WARNING,
-                    message=f"closes beyond {outlier_z} sigma of series mean",
-                    count=len(outliers),
-                )
+    med = statistics.median(closes)
+    mad = statistics.median([abs(c - med) for c in closes]) or 1e-9
+    modified_z = [0.6745 * (c - med) / mad for c in closes]
+    outliers = [
+        c for c, mz in zip(closes, modified_z) if abs(mz) > outlier_z
+    ]
+    if outliers:
+        issues.append(
+            QualityIssue(
+                check="price_outliers",
+                severity=SEVERITY_WARNING,
+                message=f"closes beyond {outlier_z} (modified z, MAD-based)",
+                count=len(outliers),
             )
+        )
 
     zero_or_negative = [c for c in closes if c <= 0]
     if zero_or_negative:
