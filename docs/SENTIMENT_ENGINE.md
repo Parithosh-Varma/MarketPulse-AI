@@ -98,6 +98,20 @@ Groupings: `aggregate_by_ticker`, `aggregate_by_source`, and fixed UTC-grid
 buckets via `aggregate_by_time_window(obs, window)` supporting 15m/1h/4h/1d/7d.
 Buckets below `min_observations` are dropped explicitly, never merged.
 
+## Momentum (Phase 4)
+
+Module: `src/momentum.py` · Schema: `SentimentMomentum`
+
+```
+momentum = current_score - previous_score        (weighted when available)
+rate_per_hour = momentum / elapsed hours
+```
+
+Classification vs noise threshold `t` (default 0.10): improving ≥ +t,
+deteriorating ≤ −t, else stable. With ≥3 points: `accelerating`
+(same-direction delta growing) and `reversal` (sign flip with both deltas
+≥ t). Descriptive research metrics — explicitly not trading signals.
+
 ## Known limitations
 
 - VADER provides a polarity proxy, not calibrated probabilities; aggregation

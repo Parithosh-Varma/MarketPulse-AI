@@ -2,6 +2,12 @@
 
 from src.models.aggregation import AggregatedSentiment
 from src.models.market import MarketObservation
+from src.models.momentum import SentimentMomentum
 from src.models.sentiment import SentimentObservation
 
-__all__ = ["AggregatedSentiment", "MarketObservation", "SentimentObservation"]
+__all__ = [
+    "AggregatedSentiment",
+    "MarketObservation",
+    "SentimentMomentum",
+    "SentimentObservation",
+]
