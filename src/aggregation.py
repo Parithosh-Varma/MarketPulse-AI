@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import statistics
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Dict, List, Mapping, Optional, Sequence
 
 from src.models import SentimentObservation
 from src.models.aggregation import AggregatedSentiment

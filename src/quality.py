@@ -7,8 +7,8 @@ raising, so pipelines can aggregate a report, log it, and decide policy
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import statistics
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
@@ -191,7 +191,7 @@ def check_market_observations(
 
     gaps = [
         (prev_ts, next_ts)
-        for prev_ts, next_ts in zip(sorted(timestamps), sorted(timestamps)[1:])
+        for prev_ts, next_ts in zip(sorted(timestamps), sorted(timestamps)[1:], strict=False)
         if (next_ts - prev_ts) > timedelta(days=5)
     ]
     if gaps:
@@ -212,7 +212,7 @@ def check_market_observations(
     mad = statistics.median([abs(c - med) for c in closes]) or 1e-9
     modified_z = [0.6745 * (c - med) / mad for c in closes]
     outliers = [
-        c for c, mz in zip(closes, modified_z) if abs(mz) > outlier_z
+        c for c, mz in zip(closes, modified_z, strict=False) if abs(mz) > outlier_z
     ]
     if outliers:
         issues.append(
@@ -265,7 +265,7 @@ def check_aggregate_continuity(
     window = ordered[0].window
     gaps = [
         (prev.window_end, curr.window_start)
-        for prev, curr in zip(ordered, ordered[1:])
+        for prev, curr in zip(ordered, ordered[1:], strict=False)
         if curr.window_start - prev.window_end > window * max_gap_multiplier
     ]
     if gaps:
@@ -280,7 +280,7 @@ def check_aggregate_continuity(
 
     jumps = [
         (a.window_end, b.window_start)
-        for a, b in zip(ordered, ordered[1:])
+        for a, b in zip(ordered, ordered[1:], strict=False)
         if abs(
             (b.mean_score if b.mean_score is not None else 0.0)
             - (a.mean_score if a.mean_score is not None else 0.0)

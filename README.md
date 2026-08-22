@@ -8,6 +8,24 @@ BTC · NIFTY 50 · GMSI · MFI · Shock Propagation
 [![Python](https://img.shields.io/badge/Python-3.11-3b82f6?style=flat-square&logo=python)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-10b981?style=flat-square)](LICENSE)
 
+> ## MarketPulse AI
+> This repository is being extended into **MarketPulse AI** — a market
+> intelligence & sentiment platform: unified FinBERT/VADER sentiment engine,
+> sentiment aggregation & momentum, price/sentiment divergence detection,
+> rule-based regime classification, walk-forward backtesting, data-quality
+> checks, alerting, and a live dashboard page.
+>
+> ```bash
+> pip install -r requirements.txt && pip install pytest vaderSentiment
+> pytest tests/ -q                                   # 241 tests, fully offline
+> python scripts/demo_marketpulse.py                 # end-to-end demo, no API keys
+> python scripts/build_pulse_summary.py              # snapshot for the dashboard
+> streamlit run dashboard/app.py                     # → "MarketPulse Live" page
+> ```
+>
+> Docs: [`docs/`](docs/) — ARCHITECTURE · ROADMAP · SENTIMENT_ENGINE ·
+> DATA_SOURCES · BACKTESTING · API
+
 ---
 
 ## 🔗 Live Dashboard

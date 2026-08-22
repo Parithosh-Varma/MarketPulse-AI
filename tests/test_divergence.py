@@ -13,8 +13,7 @@ from src.divergence import (
     price_return_over,
     simple_return,
 )
-from src.models import AggregatedSentiment, MarketObservation, DivergenceObservation
-from src.models.aggregation import AggregatedSentiment as Agg
+from src.models import AggregatedSentiment, DivergenceObservation, MarketObservation
 
 T0 = datetime(2026, 8, 20, 15, 30, tzinfo=timezone.utc)
 DAY = timedelta(days=1)

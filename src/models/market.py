@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass, field, fields
+from datetime import datetime
 from typing import Any, Dict, Optional
 
-from src.models.sentiment import _parse_timestamp, _check_range
+from src.models.sentiment import _check_range, _parse_timestamp
 
 
 @dataclass(frozen=True)

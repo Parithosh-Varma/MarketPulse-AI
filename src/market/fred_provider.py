@@ -9,8 +9,8 @@ from typing import Any, List, Optional
 
 from src.market.base import (
     CachedProviderMixin,
-    MarketDataProvider,
     MarketDataError,
+    MarketDataProvider,
     with_retries,
 )
 from src.models import MarketObservation

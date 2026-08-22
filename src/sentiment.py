@@ -49,7 +49,7 @@ def score_from_probs(
 ) -> tuple[float, float]:
     """Derive ``(score, confidence)`` from class probabilities."""
     probs = (prob_positive, prob_negative, prob_neutral)
-    for name, value in zip(("positive", "negative", "neutral"), probs):
+    for name, value in zip(("positive", "negative", "neutral"), probs, strict=False):
         if not 0.0 <= float(value) <= 1.0:
             raise ValueError(f"prob_{name} out of range [0, 1]: {value}")
     total = sum(float(p) for p in probs)
@@ -171,7 +171,7 @@ class BaseSentimentEngine(ABC):
                 timestamp=it.get("timestamp"),
                 metadata=it.get("metadata"),
             )
-            for it, result in zip(normalized, results)
+            for it, result in zip(normalized, results, strict=False)
         ]
 
 
@@ -318,8 +318,8 @@ def default_engine() -> BaseSentimentEngine:
     global _ENGINE_SINGLETON
     if _ENGINE_SINGLETON is None:
         try:
-            import transformers  # noqa: F401
             import torch  # noqa: F401
+            import transformers  # noqa: F401
 
             logger.info("Using FinBERT sentiment engine")
             _ENGINE_SINGLETON = FinBERTEngine()

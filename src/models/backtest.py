@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass, field, fields
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from src.models.aggregation import _parse_ts
 

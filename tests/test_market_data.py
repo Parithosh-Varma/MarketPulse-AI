@@ -4,8 +4,8 @@ from datetime import date, datetime, timedelta, timezone
 import pytest
 
 from src.market import (
-    FREDProvider,
     FiiDiiError,
+    FREDProvider,
     ManualCsvFiiDiiProvider,
     MarketDataError,
     YFinanceProvider,

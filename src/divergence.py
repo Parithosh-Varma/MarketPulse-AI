@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import math
 from datetime import datetime, timedelta
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
 from src.models import MarketObservation
 from src.models.aggregation import AggregatedSentiment

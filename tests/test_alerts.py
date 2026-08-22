@@ -1,14 +1,12 @@
 import json
 from datetime import datetime, timedelta, timezone
 
-import pytest
-
 from src.alerts import (
+    SEVERITY_HIGH,
+    SEVERITY_MEDIUM,
     Alert,
     AlertEngine,
     JsonlFileChannel,
-    SEVERITY_HIGH,
-    SEVERITY_MEDIUM,
     check_extreme_divergence,
     check_regime_change,
     check_sentiment_drop,
@@ -135,6 +133,6 @@ class TestJsonlChannel:
         channel.deliver(Alert(rule_name="r2", severity="high", message="m2"))
         lines = target.read_text().strip().splitlines()
         assert len(lines) == 2
-        parsed = [json.loads(l) for l in lines]
+        parsed = [json.loads(line) for line in lines]
         assert parsed[1]["rule_name"] == "r2"
         datetime.fromisoformat(parsed[0]["fired_at"])

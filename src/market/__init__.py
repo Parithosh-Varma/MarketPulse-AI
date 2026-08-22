@@ -7,13 +7,13 @@ from src.market.base import (
     resolve_ticker,
     with_retries,
 )
-from src.market.fred_provider import FREDProvider
 from src.market.fiidii import (
     FiiDiiError,
     FiiDiiObservation,
     FiiDiiProvider,
     ManualCsvFiiDiiProvider,
 )
+from src.market.fred_provider import FREDProvider
 from src.market.yfinance_provider import YFinanceProvider
 
 __all__ = [

@@ -24,7 +24,7 @@ from __future__ import annotations
 import statistics
 from bisect import bisect_right
 from datetime import datetime
-from typing import Callable, List, Optional, Sequence, Tuple
+from typing import List, Sequence, Tuple
 
 from src.models import MarketObservation
 from src.models.backtest import BacktestResult

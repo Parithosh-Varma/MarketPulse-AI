@@ -8,8 +8,8 @@ from typing import Any, List, Optional
 
 from src.market.base import (
     CachedProviderMixin,
-    MarketDataProvider,
     MarketDataError,
+    MarketDataProvider,
     resolve_ticker,
     with_retries,
 )

@@ -6,8 +6,8 @@ from src.aggregation import (
     AggregationError,
     aggregate,
     aggregate_by_source,
-    aggregate_by_time_window,
     aggregate_by_ticker,
+    aggregate_by_time_window,
     classify,
     floor_to_window,
 )

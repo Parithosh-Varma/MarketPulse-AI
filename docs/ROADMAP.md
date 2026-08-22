@@ -6,6 +6,27 @@ previous one; existing validated research code is extended, never rewritten.
 Scope guard: this is a **research and decision-support platform** — no order
 execution, no broker connections, no price-prediction claims.
 
+## Status (updated after autonomous build-out)
+
+| Phase | Status | Key artifacts |
+|---|---|---|
+| 1 — Architecture & schemas | ✅ done | `docs/ARCHITECTURE.md`, `src/models/*`, first tests |
+| 2 — Sentiment engine | ✅ done | `src/sentiment.py`, `docs/SENTIMENT_ENGINE.md` |
+| 3 — Aggregation | ✅ done | `src/aggregation.py`, `AggregatedSentiment` |
+| 4 — Momentum | ✅ done | `src/momentum.py`, `SentimentMomentum` |
+| 5 — Market data pipeline | ✅ done | `src/market/*`, `docs/DATA_SOURCES.md`, `src/timeutils.py` |
+| 6 — Divergence | ✅ done | `src/divergence.py`, `DivergenceObservation` |
+| 7 — Regime engine | ✅ done | `src/regime.py`, `MarketRegime`/`MarketStress` |
+| 8 — Backtesting | ✅ done | `src/backtest.py`, `docs/BACKTESTING.md` |
+| 9 — Dashboard | ✅ v1 live-page | `dashboard/app.py` "MarketPulse Live", `scripts/build_pulse_summary.py` |
+| 10 — Alerting | ✅ log/file channels | `src/alerts.py` (email/TG/webhook pending creds) |
+| — Data quality layer | ✅ done | `src/quality.py` |
+| — Offline demo | ✅ done | `scripts/demo_marketpulse.py` |
+
+Known gaps carried forward: FinBERT weights not vendored (downloads on first
+run); FII/DII manual CSV; alerts lack scheduler; root requirements.txt still
+needs pin/prune pass; ruff/mypy wired but not yet enforced in CI.
+
 ## Phase 1 — Repository understanding and setup ✅
 
 - Inspect structure, entry points, deps, data sources, storage, models.

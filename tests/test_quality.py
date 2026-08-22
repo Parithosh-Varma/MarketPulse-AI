@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-import pytest
-
+from src.models import AggregatedSentiment, MarketObservation, SentimentObservation
 from src.quality import (
     SEVERITY_ERROR,
     SEVERITY_WARNING,
@@ -10,7 +9,6 @@ from src.quality import (
     check_market_observations,
     check_sentiment_observations,
 )
-from src.models import AggregatedSentiment, MarketObservation, SentimentObservation
 
 NOW = datetime.now(timezone.utc)
 

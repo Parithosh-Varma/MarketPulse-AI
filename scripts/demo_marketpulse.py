@@ -22,10 +22,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from src.aggregation import aggregate_by_ticker, aggregate_by_time_window  # noqa: E402
-from src.backtest import backtest_signal, compare_with_baseline, daily_sentiment_signal  # noqa: E402
+from src.backtest import (  # noqa: E402
+    backtest_signal,
+    compare_with_baseline,
+    daily_sentiment_signal,
+)
 from src.divergence import detect_divergence  # noqa: E402
-from src.market.base import resolve_ticker  # noqa: E402
-from src.models import MarketObservation, SentimentObservation  # noqa: E402
+from src.models import MarketObservation  # noqa: E402
 from src.momentum import momentum_series  # noqa: E402
 from src.quality import build_report, check_market_observations  # noqa: E402
 from src.regime import RegimeInputs, classify_regime  # noqa: E402

@@ -119,9 +119,12 @@ def _cmp(value: Optional[float], predicate) -> Optional[bool]:
     return predicate(value)
 
 
+_DEFAULT_CONFIG = RegimeConfig()
+
+
 def classify_regime(
     inputs: RegimeInputs,
-    config: RegimeConfig = RegimeConfig(),
+    config: RegimeConfig = _DEFAULT_CONFIG,
 ) -> MarketRegime:
     """Run the rule ladder over ``inputs`` and produce an auditable regime."""
     c = config
