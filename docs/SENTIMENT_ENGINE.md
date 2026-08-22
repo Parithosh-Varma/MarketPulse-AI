@@ -80,6 +80,24 @@ e = FinBERTEngine()
 print(e.analyze('Markets rally as inflation cools', ticker='NIFTY').score)"
 ```
 
+## Aggregation (Phase 3)
+
+Module: `src/aggregation.py` · Schema: `AggregatedSentiment`
+
+- `mean_score` — arithmetic mean of scores in the group.
+- `weighted_score` — Σ(wᵢ·scoreᵢ)/Σwᵢ with configurable per-source weights
+  (`source_weights`); unknown sources use `default_source_weight=1.0`.
+  Sources are not assumed equally reliable.
+- `median_score` — robust central tendency.
+- `mean_confidence` — mean of engine-reported confidences (None for
+  pure-VADER corpora).
+- `share_positive/negative/neutral` — fraction of observations with
+  score > 0 / < 0 / == 0 (sign rule, engine-agnostic).
+
+Groupings: `aggregate_by_ticker`, `aggregate_by_source`, and fixed UTC-grid
+buckets via `aggregate_by_time_window(obs, window)` supporting 15m/1h/4h/1d/7d.
+Buckets below `min_observations` are dropped explicitly, never merged.
+
 ## Known limitations
 
 - VADER provides a polarity proxy, not calibrated probabilities; aggregation
