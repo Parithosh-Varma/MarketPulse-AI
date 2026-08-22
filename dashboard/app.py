@@ -12,7 +12,7 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 from scipy.stats import pearsonr, spearmanr, wasserstein_distance
 from PIL import Image
-import os, warnings
+import os, json, warnings
 warnings.filterwarnings("ignore")
 
 # ── Page config ───────────────────────────────────────────────────────────────
@@ -486,6 +486,7 @@ def t(fig, h=None, title=None, ts=12, xt=None, yt=None, barmode=None, showlegend
 
 PAGES = [
     ("overview",    "Overview & Key Results",       "M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0zm9-3.5v4l3 1.5"),
+    ("pulse",       "MarketPulse Live",              "M13 2L3 14h7l-1 8 10-12h-7l1-8z"),
     ("gmsi",        "GMSI & Conditional Vol.",       "M3 3h18v4H3zm0 7h18v4H3zm0 7h18v4H3"),
     ("placebo",     "Placebo & Robustness",          "M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0"),
     ("mfi",         "Market Fragility Index",        "M13 10V3L4 14h7v7l9-11h-7"),
@@ -781,6 +782,136 @@ if page == "overview":
                  <span style="color:#8ba3c4;"> Paper 2 — writing in progress</span></div>
         </div>
         """, unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PAGE 1b — MARKETPULSE LIVE (computed intelligence snapshot)
+# ══════════════════════════════════════════════════════════════════════════════
+elif page == "pulse":
+    page_header("Live sentiment, momentum, divergence, regime and alert snapshot — computed by the MarketPulse engine.")
+
+    _summary_path = os.path.join(os.path.dirname(__file__), "..", "data", "processed", "marketpulse_summary.json")
+    _alerts_path = os.path.join(os.path.dirname(__file__), "..", "data", "processed", "alerts.jsonl")
+
+    if not os.path.exists(_summary_path):
+        st.warning("No MarketPulse snapshot found. Generate one with:")
+        st.code("python scripts/build_pulse_summary.py", language="bash")
+        st.caption("The snapshot builder runs fully offline on the sample corpus in data/raw/.")
+    else:
+        with open(_summary_path) as fh:
+            snap = json.load(fh)
+
+        st.markdown(
+            f"<div style='font-family:var(--mono);font-size:10px;color:#4a607d;"
+            f"letter-spacing:.1em;'>SNAPSHOT · {snap['generated_at'][:19]}Z · "
+            f"ENGINE {snap.get('engine_model','?').upper()} · FOCUS {snap['focus_symbol']}</div>",
+            unsafe_allow_html=True,
+        )
+
+        # ── top metric cards ──
+        sent_n = sum(v["n"] for v in snap["sentiment_by_asset"].values())
+        div = snap.get("divergence") or {}
+        reg = snap.get("regime") or {}
+        bt = snap.get("backtest") or {}
+        cards = [
+            ("Articles scored", str(sent_n), "sample corpus", "a"),
+            ("Divergence", str(div.get("classification", "—")),
+             f"score {div.get('score', 0):+.2f}" if div else "", "r" if str(div.get("classification","")).startswith(("bear","bull")) else "g"),
+            ("Regime", str(reg.get("regime", "—")).upper(),
+             f"confidence {reg.get('confidence', 0):.0%}" if reg else "", "c"),
+            ("Signal hit rate", f"{bt['hit_rate']:.0%}" if bt else "—",
+             f"vs base {bt['random_hit_rate']:.0%} · n={bt.get('n_evaluated',0)}" if bt else "", "nifty"),
+        ]
+        c1, c2, c3, c4 = st.columns(4)
+        for col, (lbl, val, sub, cls) in zip([c1, c2, c3, c4], cards):
+            with col:
+                st.markdown(f"""<div class='kcard {cls}'>
+                    <div class='klabel'>{lbl}</div>
+                    <div class='kval' style='font-size:17px;'>{val}</div>
+                    <div class='ksub'>{sub}</div>
+                </div>""", unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        col_l, col_r = st.columns([2, 3])
+
+        with col_l:
+            st.markdown("<div class='sh'>Sentiment by Asset</div>", unsafe_allow_html=True)
+            rows = []
+            for ticker, v in snap["sentiment_by_asset"].items():
+                rows.append({
+                    "Asset": ticker,
+                    "Score": f"{v['score']:+.3f}",
+                    "Pos%": f"{v['share_positive']:.0%}",
+                    "Neg%": f"{v['share_negative']:.0%}",
+                    "Neu%": f"{v['share_neutral']:.0%}",
+                    "n": v["n"],
+                })
+            st.dataframe(pd.DataFrame(rows).set_index("Asset"), use_container_width=True)
+            if snap.get("backtest"):
+                b = snap["backtest"]
+                st.markdown(f"""
+                <div class='cbox cbox-blue'>
+                    <span class='tag tag-blue'>WALK-FORWARD BACKTEST</span><br>
+                    hit rate <strong>{b['hit_rate']:.0%}</strong> vs random baseline
+                    <strong>{b['random_hit_rate']:.0%}</strong> over
+                    n={b['n_evaluated']} signals.<br>
+                    mean fwd {b['mean_forward_return']:+.2%} · buy-hold {b['buy_hold']:+.2%}
+                    · maxDD {b['max_drawdown']:.1%}<br>
+                    <em>{b['note']}</em>
+                </div>""", unsafe_allow_html=True)
+
+        with col_r:
+            st.markdown("<div class='sh'>Recent Sentiment Momentum</div>", unsafe_allow_html=True)
+            mom_rows = snap.get("momentum_recent") or []
+            if mom_rows:
+                fig_m = go.Figure()
+                fig_m.add_trace(go.Scatter(
+                    x=[m["as_of"] for m in mom_rows],
+                    y=[m["current"] for m in mom_rows],
+                    name="sentiment", line=dict(color=C["gmsi"], width=2),
+                    mode="lines+markers"))
+                fig_m.add_trace(go.Bar(
+                    x=[m["as_of"] for m in mom_rows],
+                    y=[m["momentum"] for m in mom_rows],
+                    name="Δ momentum",
+                    marker_color=[
+                        C["green"] if m["momentum"] > 0 else C["red"] for m in mom_rows],
+                    opacity=0.55))
+                t(fig_m, h=300, title=f"{snap['focus_symbol']} daily aggregate & momentum", ts=12)
+                st.plotly_chart(fig_m, use_container_width=True)
+            else:
+                st.info("Fewer than two aligned daily buckets in the current corpus.")
+
+        # ── alerts feed ──
+        st.markdown("<br><div class='sh'>Alert Feed</div>", unsafe_allow_html=True)
+        recent_alerts = []
+        if os.path.exists(_alerts_path):
+            with open(_alerts_path) as fh:
+                lines = fh.read().strip().splitlines()
+            recent_alerts = [json.loads(l) for l in lines[-8:]][::-1]
+        run_alerts = snap.get("alerts_fired_this_run") or []
+        if recent_alerts or run_alerts:
+            seen = set()
+            merged = []
+            for a in recent_alerts + run_alerts:
+                key = (a["rule_name"], a.get("fired_at"))
+                if key in seen:
+                    continue
+                seen.add(key)
+                merged.append(a)
+            for a in merged[:8]:
+                sev_color = {"high": "#ef4444", "medium": "#f59e0b", "low": "#64748b"}.get(a["severity"], "#64748b")
+                st.markdown(
+                    f"<div style='border-left:3px solid {sev_color};padding:6px 12px;"
+                    f"margin:4px 0;background:#0d1320;font-family:var(--mono);font-size:11px;'>"
+                    f"<strong style='color:{sev_color};'>⚠ {a['rule_name']}</strong> "
+                    f"<span style='color:#4a607d;'>{str(a.get('fired_at',''))[:19]}Z</span><br>"
+                    f"<span style='color:#dce8f5;'>{a['message']}</span></div>",
+                    unsafe_allow_html=True,
+                )
+        else:
+            st.success("No alerts fired in the latest evaluation window.")
+        st.caption("Alerts evaluate the latest snapshot only; wire a cron/refresh job to accumulate history.")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE 2 — GMSI & CONDITIONAL VOLATILITY
