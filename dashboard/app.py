@@ -793,9 +793,22 @@ elif page == "pulse":
     _alerts_path = os.path.join(os.path.dirname(__file__), "..", "data", "processed", "alerts.jsonl")
 
     if not os.path.exists(_summary_path):
-        st.warning("No MarketPulse snapshot found. Generate one with:")
-        st.code("python scripts/build_pulse_summary.py", language="bash")
-        st.caption("The snapshot builder runs fully offline on the sample corpus in data/raw/.")
+        try:
+            import sys as _sys
+            _root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            if _root not in _sys.path:
+                _sys.path.insert(0, _root)
+            from scripts.build_pulse_summary import build_snapshot
+            st.info("No snapshot found — computing one now (offline, ~10s)…")
+            snap = build_snapshot(400)
+            os.makedirs(os.path.dirname(_summary_path), exist_ok=True)
+            with open(_summary_path, "w") as fh:
+                json.dump(snap, fh)
+        except Exception as e:
+            st.warning("No MarketPulse snapshot found and auto-build failed.")
+            st.code("python scripts/build_pulse_summary.py", language="bash")
+            st.caption(f"detail: {e}")
+            st.stop()
     else:
         with open(_summary_path) as fh:
             snap = json.load(fh)

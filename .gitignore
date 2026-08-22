@@ -33,3 +33,6 @@ notebooks/data/raw/
 
 # Parquet cache files
 *.parquet
+
+# MarketPulse snapshot is small and needed by the deployed dashboard
+!data/processed/marketpulse_summary.json
