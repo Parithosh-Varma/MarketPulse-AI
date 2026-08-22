@@ -15,6 +15,8 @@ BTC · NIFTY 50 · GMSI · MFI · Shock Propagation
 > rule-based regime classification, walk-forward backtesting, data-quality
 > checks, alerting, and a live dashboard page.
 >
+> **🌐 Public demo (no install): [parithosh-varma.github.io/MarketPulse-AI](https://parithosh-varma.github.io/MarketPulse-AI/)**
+>
 > ```bash
 > pip install -r requirements.txt && pip install pytest vaderSentiment
 > pytest tests/ -q                                   # 241 tests, fully offline
