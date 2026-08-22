@@ -1,6 +1,7 @@
 """Typed data schemas for MarketPulse AI (sentiment + market observations)."""
 
 from src.models.aggregation import AggregatedSentiment
+from src.models.backtest import BacktestResult
 from src.models.divergence import DivergenceObservation
 from src.models.market import MarketObservation
 from src.models.momentum import SentimentMomentum
@@ -9,6 +10,7 @@ from src.models.sentiment import SentimentObservation
 
 __all__ = [
     "AggregatedSentiment",
+    "BacktestResult",
     "DivergenceObservation",
     "MarketObservation",
     "MarketRegime",
