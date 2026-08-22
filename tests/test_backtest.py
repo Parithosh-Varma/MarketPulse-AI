@@ -80,6 +80,19 @@ class TestBacktestSignal:
         assert result.n_evaluated == 1
         assert result.metadata["skipped_incomplete_window"] == 1
 
+    def test_signal_older_than_price_history_is_skipped_not_clamped(self):
+        prices = make_prices([100, 101, 102, 103])
+        ancient = T0 - timedelta(days=30)
+        result = backtest_signal(
+            prices,
+            [(ancient, 0.9), (T0 + DAY, 0.9)],
+            signal_name="old_signal",
+            symbol="TEST",
+            horizon_bars=1,
+        )
+        assert result.n_evaluated == 1
+        assert result.metadata["skipped_incomplete_window"] == 1
+
     def test_negative_signal_predicting_drop(self):
         closes = [100, 100, 95, 95, 92]
         prices = make_prices(closes)

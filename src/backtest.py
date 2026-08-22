@@ -101,6 +101,11 @@ def backtest_signal(
 
     for ts, value in ordered:
         entry_idx = _closes_after(timestamps, closes, ts)
+        # entry_idx == 0 => the signal predates every bar; entering at bar 0
+        # would fabricate a common window for all such signals, so skip them.
+        if entry_idx == 0:
+            skipped_incomplete += 1
+            continue
         exit_idx = entry_idx + horizon_bars
         if exit_idx >= len(closes):
             skipped_incomplete += 1
